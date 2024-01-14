@@ -1,24 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { HiMiniArrowLeftOnRectangle } from "react-icons/hi2";
 import { Prompt } from "../../Components/Prompt";
+import { useDispatch, useSelector } from 'react-redux';
+import { setConvos } from '../../state';
 
 export const LeftCont = () => {
+    const dispatch = useDispatch();
+    const conversations = useSelector((state) => state.conversations)
+    
+    const fetchConvos = async() => {
+        try{
+            const response = await fetch(`http://localhost:3000/prompt`, {
+                method:"GET", 
+                "content-type": "application/json"
+            });
+            const data = await response.json();
+            dispatch(setConvos({conversations: data}));
+        }
+        catch(e){
+            console.log(e);
+        }
+    }
+
+    const handleNewChat = async()=> {
+        try{
+            const response = await fetch(`http://localhost:3000/prompt/create`, {
+                method:"POST",
+            });
+
+            const data = await response.json();
+            console.log(data);
+        }
+        catch(e){
+            console.log(e);
+        }    
+    }
+    useEffect(()=>{
+        fetchConvos();
+    }, [conversations]);
+
   return (
     <div className='w-1/4 h-[91vh] bg-main-bg border-r-2 border-gray-800 p-6'>
         <h1 className="text-3xl font-semibold text-white">
             Text Generator
         </h1>
         <div className="h-[65vh] mt-6 overflow-y-auto overflow-x-hidden flex flex-col gap-3">
-            <Prompt Text="Impact of AI on User Experiences" active/>
-            <Prompt Text="Voice User Interfaces (VUI)" />
-            <Prompt Text="Data-Driven UX" />
-            <Prompt Text="Chatbots and Conversational AI" />
-            <Prompt Text="Visual Recognition in UX" />
-            <Prompt Text="Ethical AI design" />
+            {conversations
+                &&
+                conversations.map((conversation, index) => (
+                    <Prompt key={index} Text={conversation.title} id={conversation._id} />
+                ))
+            }
         </div>
         <div className='flex flex-col gap-2'>
-            <div className='rounded-3xl flex items-center gap-2 text-xs px-4 text-green-500 border-2 border-green-700 p-2 w-full cursor-pointer'>
+            <div className='rounded-3xl flex items-center gap-2 text-xs px-4 text-green-500 border-2 border-green-700 p-2 w-full cursor-pointer'
+             onClick={handleNewChat}>
                 <IoIosAddCircleOutline fontSize={"1.25rem"}/> New Chat
             </div>
             <div className='rounded-3xl flex items-center gap-2 px-4 text-xs text-red-500 border-red-500 border-2 p-2 w-full cursor-pointer'>

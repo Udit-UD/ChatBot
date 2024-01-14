@@ -1,7 +1,14 @@
 import express from "express";
-import { sendMsgToOpenAI } from "../Controllers/prompt.js";
+import { sendMsgToOpenAI, accessConversation, createConversation, fetchConversations } from "../Controllers/prompt.js";
 
 
 const router = express.Router();
-router.post("/", sendMsgToOpenAI);
+// GET
+
+router.get("/", fetchConversations);
+router.get("/:id", accessConversation);
+
+// POST
+router.post("/create", createConversation);
+router.post("/:id", sendMsgToOpenAI);
 export default router;

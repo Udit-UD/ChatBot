@@ -1,15 +1,30 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MessageBox } from '../../Components/MessageBox';
 import { IoAttach, IoMicOutline } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
+import { useParams } from 'react-router-dom';
 
 export const RightCont = () => {
   const [prompt, setPrompt] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      
+  const {id} = useParams();
+
+  const [messages, setMessages] = useState([]);
+  const fetchConversation = async() => {
+    try{
+      const response = await fetch(`http://localhost:3000/prompt/${id}`, {
+        method:"GET", 
+      });
+      const data = await response.json();
+      setMessages(data.history.map(item => ({
+        sender: item.sender,
+        text: item.text,
+      })));
+
     }
-  ]);
+    catch(e){
+      console.log(e);
+    }
+  }
   const handleSend = async() => {
     try{
       setPrompt("");
@@ -17,10 +32,10 @@ export const RightCont = () => {
         ...prevMessages,
         {
           text: prompt,
-          isAssistant: false,
+          sender: "user",
         },
       ]);
-      const res = await fetch(`http://localhost:3000/prompt`,{
+      const res = await fetch(`http://localhost:3000/prompt/${id}`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json", 
@@ -32,8 +47,8 @@ export const RightCont = () => {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
-            text: data.finalRes.message.content,
-            isAssistant: true,
+            text: data,
+            sender: "assistant",
           },
         ]);
       }
@@ -47,13 +62,19 @@ export const RightCont = () => {
     }
   }
 
+
+
+  useEffect(()=>{
+    fetchConversation();
+  }, []);
+
   return (
     <div className='relative w-3/4 h-[91vh] bg-main-bg pt-10 px-12 pb-8'>
       <div className='overflow-y-auto h-[75vh]'>
 
       { messages.length !== 1 ? 
         messages.map((message, index) => (
-          <MessageBox key={index} text={message.text} isAssistant={message.isAssistant} />
+          <MessageBox key={index} text={message.text} isAssistant={message.sender === "assistant"} />
         )) : 
         <div className='flex justify-center items-center font-bold text-2xl text-gray-100 h-[70vh]'>
           Start Chatting...
