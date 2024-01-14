@@ -7,6 +7,7 @@ import morgan from "morgan";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import promptRoutes from "./routes/prompt.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,13 +20,20 @@ app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true}));
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 app.use(cors());
+const PORT = 3000;
 
 app.use("/prompt", promptRoutes);
 
+
+try{
+  app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
+}catch(error){
+  console.log(`${error} did not connect!`);
+}
 // MONGOOSE SETUP
-const PORT = process.env.PORT || 6001;
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
-  })
-  .catch((error) => console.log(`${error} did not connect!`));
+// const PORT = process.env.PORT || 6001;
+// mongoose.connect(process.env.MONGO_URL)
+//   .then(() => {
+//     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
+//   })
+//   .catch((error) => console.log(`${error} did not connect!`));
