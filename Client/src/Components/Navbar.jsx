@@ -17,7 +17,7 @@ export const Navbar = () => {
             </div>
         </div>
         <div className="w-[15%] flex justify-end mr-10 items-center gap-8 ">
-            <RiNotificationLine color='white' fontSize={"1.25rem"}/>
+            <RiNotificationLine className='relative' color='white' fontSize={"1.25rem"} /> 
             <div className='flex justify-center items-center gap-1 '>
                 <div className='rounded-full w-8 h-8 overflow-hidden cursor-pointer' >
                     <img src={Profile} alt="" className="w-full h-full object-cover" />

@@ -2,15 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { HiMiniArrowLeftOnRectangle } from "react-icons/hi2";
 import { Prompt } from "../../Components/Prompt";
+import { Loading } from "../../Components/Loading";
 import { useDispatch, useSelector } from 'react-redux';
 import { setConvos } from '../../state';
-
+import { useNavigate } from 'react-router-dom';
 export const LeftCont = () => {
     const dispatch = useDispatch();
-    const conversations = useSelector((state) => state.conversations)
+    const conversations = useSelector((state) => state.conversations);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     
     const fetchConvos = async() => {
         try{
+            setLoading(true);
             const response = await fetch(`http://localhost:3000/prompt`, {
                 method:"GET", 
                 "content-type": "application/json"
@@ -19,26 +23,39 @@ export const LeftCont = () => {
             dispatch(setConvos({conversations: data}));
         }
         catch(e){
+            alert(e);
             console.log(e);
+        }
+        finally{
+            setLoading(false);
         }
     }
 
     const handleNewChat = async()=> {
         try{
+            setLoading(true);
             const response = await fetch(`http://localhost:3000/prompt/create`, {
                 method:"POST",
             });
 
             const data = await response.json();
             console.log(data);
+            navigate(`/${data.conversationId}`);
+            if(response.ok){
+                fetchConvos();
+            }
         }
         catch(e){
+            alert(e);
             console.log(e);
-        }    
+        }   
+        finally{
+            setLoading(false);
+        } 
     }
     useEffect(()=>{
         fetchConvos();
-    }, [conversations]);
+    }, []);
 
   return (
     <div className='w-1/4 h-[91vh] bg-main-bg border-r-2 border-gray-800 p-6'>
@@ -46,7 +63,13 @@ export const LeftCont = () => {
             Text Generator
         </h1>
         <div className="h-[65vh] mt-6 overflow-y-auto overflow-x-hidden flex flex-col gap-3">
-            {conversations
+            {
+            loading ? 
+                <div className="h-[65vh] flex justify-center items-center">
+                    <Loading />
+                </div>
+            :
+            conversations
                 &&
                 conversations.map((conversation, index) => (
                     <Prompt key={index} Text={conversation.title} id={conversation._id} />
