@@ -4,18 +4,18 @@ import { HiMiniArrowLeftOnRectangle } from "react-icons/hi2";
 import { Prompt } from "../../Components/Prompt";
 import { Loading } from "../../Components/Loading";
 import { useDispatch, useSelector } from 'react-redux';
-import { setConvos } from '../../state';
-import { useNavigate } from 'react-router-dom';
+import { setConvos, setselectedConvo } from '../../state';
+
 export const LeftCont = () => {
     const dispatch = useDispatch();
     const conversations = useSelector((state) => state.conversations);
-    const navigate = useNavigate();
+    const selectedConvo = useSelector((state) => state.selectedConvo);
     const [loading, setLoading] = useState(false);
     
     const fetchConvos = async() => {
         try{
             setLoading(true);
-            const response = await fetch(`http://localhost:3000/prompt`, {
+            const response = await fetch(`https://chat-bot-api-five.vercel.app/prompt`, {
                 method:"GET", 
                 "content-type": "application/json"
             });
@@ -34,13 +34,13 @@ export const LeftCont = () => {
     const handleNewChat = async()=> {
         try{
             setLoading(true);
-            const response = await fetch(`http://localhost:3000/prompt/create`, {
+            const response = await fetch(`https://chat-bot-api-five.vercel.app/prompt/create`, {
                 method:"POST",
             });
 
             const data = await response.json();
             console.log(data);
-            navigate(`/${data.conversationId}`);
+            dispatch(setselectedConvo(data.conversationId));
             if(response.ok){
                 fetchConvos();
             }
@@ -72,7 +72,7 @@ export const LeftCont = () => {
             conversations
                 &&
                 conversations.map((conversation, index) => (
-                    <Prompt key={index} Text={conversation.title} id={conversation._id} />
+                    <Prompt key={index} Text={conversation.title} active={selectedConvo === conversation._id} id={conversation._id} />
                 ))
             }
         </div>
