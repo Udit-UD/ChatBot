@@ -15,7 +15,7 @@ export const LeftCont = () => {
     const fetchConvos = async() => {
         try{
             setLoading(true);
-            const response = await fetch(`https://chat-bot-api-five.vercel.app/prompt`, {
+            const response = await fetch(`http://localhost:3000/prompt`, {
                 method:"GET", 
                 "content-type": "application/json"
             });
@@ -34,7 +34,7 @@ export const LeftCont = () => {
     const handleNewChat = async()=> {
         try{
             setLoading(true);
-            const response = await fetch(`https://chat-bot-api-five.vercel.app/prompt/create`, {
+            const response = await fetch(`http://localhost:3000/prompt/create`, {
                 method:"POST",
             });
 
